@@ -1,110 +1,161 @@
-# FHEVM Hardhat Template
+# Votechain Ballot
 
-A Hardhat-based template for developing Fully Homomorphic Encryption (FHE) enabled Solidity smart contracts using the
-FHEVM protocol by Zama.
+Encrypted MVP rating system inspired by the [votechain-ballot-box UI](https://github.com/PatriciaLawson33/votechain-ballot-box) and powered by Zama's FHEVM.
+Fans can rate players from 1-11 points with private encrypted votes, tally owners can decrypt locally, and the RainbowKit wallet surface keeps onboarding lightweight.
 
-## Quick Start
+## Highlights
 
-For detailed instructions see:
-[FHEVM Hardhat Quick Start Tutorial](https://docs.zama.ai/protocol/solidity-guides/getting-started/quick-start-tutorial)
+- **`EncryptedMvpVoting.sol`** aggregates encrypted 1-11 point ratings per player and stores decrypted tally metadata.
+- **RainbowKit + wagmi** integration with a custom neon-themed UI and brand assets (logo + favicon).
+- **FHE-friendly hooks** (`useEncryptedMvpVoting`, `useRainbowSigner`) encapsulate encryption, decryption and contract reads/writes.
+- **End-to-end tests** (`EncryptedMvpVoting.ts`, `EncryptedMvpVotingSepolia.ts`) prove the encrypted flow locally and against Sepolia.
 
-### Prerequisites
-
-- **Node.js**: Version 20 or higher
-- **npm or yarn/pnpm**: Package manager
-
-### Installation
-
-1. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-2. **Set up environment variables**
-
-   ```bash
-   npx hardhat vars set MNEMONIC
-
-   # Set your Infura API key for network access
-   npx hardhat vars set INFURA_API_KEY
-
-   # Optional: Set Etherscan API key for contract verification
-   npx hardhat vars set ETHERSCAN_API_KEY
-   ```
-
-3. **Compile and test**
-
-   ```bash
-   npm run compile
-   npm run test
-   ```
-
-4. **Deploy to local network**
-
-   ```bash
-   # Start a local FHEVM-ready node
-   npx hardhat node
-   # Deploy to local network
-   npx hardhat deploy --network localhost
-   ```
-
-5. **Deploy to Sepolia Testnet**
-
-   ```bash
-   # Deploy to Sepolia
-   npx hardhat deploy --network sepolia
-   # Verify contract on Etherscan
-   npx hardhat verify --network sepolia <CONTRACT_ADDRESS>
-   ```
-
-6. **Test on Sepolia Testnet**
-
-   ```bash
-   # Once deployed, you can run a simple test on Sepolia.
-   npx hardhat test --network sepolia
-   ```
-
-## 📁 Project Structure
+## Repository layout
 
 ```
-fhevm-hardhat-template/
-├── contracts/           # Smart contract source files
-│   └── FHECounter.sol   # Example FHE counter contract
-├── deploy/              # Deployment scripts
-├── tasks/               # Hardhat custom tasks
-├── test/                # Test files
-├── hardhat.config.ts    # Hardhat configuration
-└── package.json         # Dependencies and scripts
+votechain-ballot/
+├── contracts/EncryptedMvpVoting.sol   # Core contract
+├── deploy/deploy.ts                   # Hardhat-deploy script (seeds 3 starters)
+├── test/                              # Local + Sepolia specs
+├── frontend/                          # Next.js app with RainbowKit UI
+│   ├── hooks/useEncryptedMvpVoting.ts # Contract/FHE orchestrator
+│   ├── components/TopNav.tsx          # Logo + Connect button
+│   └── public/votechain-icon.svg      # Brand assets
+└── README.md                          # (You are here)
 ```
 
-## 📜 Available Scripts
+## Prerequisites
 
-| Script             | Description              |
-| ------------------ | ------------------------ |
-| `npm run compile`  | Compile all contracts    |
-| `npm run test`     | Run all tests            |
-| `npm run coverage` | Generate coverage report |
-| `npm run lint`     | Run linting checks       |
-| `npm run clean`    | Clean build artifacts    |
+- Node.js ≥ 20
+- npm
+- Python (only needed if you want to regenerate the PNG favicon)
 
-## 📚 Documentation
+## Backend workflow
 
-- [FHEVM Documentation](https://docs.zama.ai/fhevm)
-- [FHEVM Hardhat Setup Guide](https://docs.zama.ai/protocol/solidity-guides/getting-started/setup)
-- [FHEVM Testing Guide](https://docs.zama.ai/protocol/solidity-guides/development-guide/hardhat/write_test)
-- [FHEVM Hardhat Plugin](https://docs.zama.ai/protocol/solidity-guides/development-guide/hardhat)
+   ```bash
+cd votechain-ballot
+npm install
 
-## 📄 License
+# Compile & typegen
+npm run compile
 
-This project is licensed under the BSD-3-Clause-Clear License. See the [LICENSE](LICENSE) file for details.
+# Run hardhat unit tests (mock FHE VM)
+npm run test
 
-## 🆘 Support
+# Configure Sepolia credentials once (addresses injected via hardhat-vars)
+npx hardhat vars set PRIVATE_KEY      # paste the deployer key used in MetaMask
+npx hardhat vars set SEPOLIA_RPC_URL  # optional custom RPC, defaults to Infura
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/zama-ai/fhevm/issues)
-- **Documentation**: [FHEVM Docs](https://docs.zama.ai)
-- **Community**: [Zama Discord](https://discord.gg/zama)
+# (Optional) start a local FHE-ready node & deploy
+npx hardhat node            # terminal A
+npx hardhat deploy --network localhost --reset   # terminal B
 
----
+# (Optional) Sepolia deployment
+npx hardhat deploy --network sepolia
+npx hardhat test --network sepolia
+```
 
-**Built with ❤️ by the Zama team**
+Custom tasks (see `tasks/EncryptedMvpVoting.ts`):
+
+- `npx hardhat task:list-players`
+- `npx hardhat task:vote --player 0 --weight 1`
+- `npx hardhat task:decrypt-player --player 0`
+
+## Frontend workflow
+
+   ```bash
+cd frontend
+npm install
+npm run genabi       # pulls ABI & addresses from ../deployments
+npm run dev          # http://localhost:3000
+   ```
+
+UI acceptance checklist:
+
+- RainbowKit connect button fixed in the top-right corner.
+- Hero section + cards match the neon/spatial layout from votechain-ballot-box (adjusted for Next.js).
+- Player cards trigger: encrypted vote, local decrypt (FHE signature), oracle request.
+- All copy, tooltips and docs are in **English**, per requirements.
+- RainbowKit locale强制为 `en-US`，避免浏览器语言切换导致按钮出现中文提示。
+
+## Brand updates
+
+- `frontend/public/votechain-icon.svg` – new logomark for the navbar.
+- `frontend/app/icon.png` – generated favicon/browser icon.
+
+## Testing & linting
+
+- Smart contracts: `npm run test`
+- Frontend lint: `cd frontend && npm run lint`
+
+## Deployment tips
+
+- Always run `npm run genabi` inside `frontend/` after redeploying contracts.
+- Set `NEXT_PUBLIC_WALLETCONNECT_ID` and `NEXT_PUBLIC_SEPOLIA_RPC` for production builds.
+
+### Dynamic contract addresses
+
+The frontend supports dynamic contract address configuration via environment variables. This allows overriding the static addresses generated by `genabi`.
+
+⚠️ **Important**: Always ensure your wallet network matches the contract network. The frontend will show an error if you try to interact with a contract on a different network than your wallet is connected to.
+
+Create a `.env.local` file in the `frontend/` directory:
+
+   ```bash
+# Wallet Connect Configuration
+NEXT_PUBLIC_WALLETCONNECT_ID=your_walletconnect_project_id_here
+
+# Sepolia RPC Configuration (optional, defaults to Infura)
+NEXT_PUBLIC_SEPOLIA_RPC=https://sepolia.infura.io/v3/your_infura_key_here
+NEXT_PUBLIC_INFURA_ID=your_infura_project_id_here
+
+# Dynamic Contract Address Configuration
+# These override the static addresses from EncryptedMvpVotingAddresses.ts
+
+# Localhost (Hardhat) contract address
+NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+
+# Sepolia contract address (set after deployment)
+NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA=0x0000000000000000000000000000000000000000
+
+# Custom network example
+# NEXT_PUBLIC_CONTRACT_ADDRESS_12345=0xabcdefabcdefabcdefabcdefabcdefabcdefabcd
+```
+
+If not set, the frontend falls back to addresses from `EncryptedMvpVotingAddresses.ts` (generated by `npm run genabi`).
+
+### Network configuration mismatch
+
+**Symptom**: "Network mismatch! Contract is on [network] but wallet is on [network]"
+
+**Causes**:
+- Wallet connected to different network than contract deployment
+- Environment variables point to wrong network contracts
+- Static configuration not updated after network switch
+
+**Solutions**:
+
+1. **Check wallet network**:
+   - Click network dropdown in MetaMask
+   - Switch to the network where your contract is deployed
+   - For localhost development: use "Localhost 8545"
+   - For testnet: use "Sepolia"
+
+2. **Update environment variables**:
+   ```bash
+   # For localhost development
+   NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+
+   # For Sepolia testnet
+   NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA=0x214664770c723B1694F43E1F26613fdbA957D6F4
+   ```
+
+3. **Regenerate ABI after deployment**:
+   ```bash
+   cd frontend
+   npm run genabi
+   ```
+
+- For Sepolia oracle decryptions, wait for the KMS callback after calling `requestOnchainDecryption`.
+
+Enjoy secure MVP voting! 🏀🛡️
