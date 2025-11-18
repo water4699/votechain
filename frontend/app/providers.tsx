@@ -32,7 +32,7 @@ const hardhatChain = {
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_ID ?? "ef3325a718834a2b1b4134d3f520933d";
 // Use Infura Sepolia RPC with provided API key
 const sepoliaRpc =
-  process.env.NEXT_PUBLIC_SEPOLIA_RPC ?? "https://sepolia.infura.io/v3/b18fb7e6ca7045ac83c41157ab93f990";
+  process.env.NEXT_PUBLIC_SEPOLIA_RPC ?? "https://sepolia.infura.io/v3/your_infura_api_key_here";
 
 const queryClient = new QueryClient();
 

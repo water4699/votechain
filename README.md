@@ -76,7 +76,7 @@ UI acceptance checklist:
 - Hero section + cards match the neon/spatial layout from votechain-ballot-box (adjusted for Next.js).
 - Player cards trigger: encrypted vote, local decrypt (FHE signature), oracle request.
 - All copy, tooltips and docs are in **English**, per requirements.
-- RainbowKit locale强制为 `en-US`，避免浏览器语言切换导致按钮出现中文提示。
+- RainbowKit locale is forced to `en-US` to prevent Chinese prompts when browser language changes.
 
 ## Brand updates
 
@@ -144,10 +144,10 @@ If not set, the frontend falls back to addresses from `EncryptedMvpVotingAddress
 2. **Update environment variables**:
    ```bash
    # For localhost development
-   NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+   NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x0000000000000000000000000000000000000000
 
    # For Sepolia testnet
-   NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA=0x214664770c723B1694F43E1F26613fdbA957D6F4
+   NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA=0x0000000000000000000000000000000000000000
    ```
 
 3. **Regenerate ABI after deployment**:

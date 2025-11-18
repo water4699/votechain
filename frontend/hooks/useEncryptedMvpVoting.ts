@@ -56,7 +56,7 @@ function getContractInfo(chainId?: number): ContractInfo {
     return { abi };
   }
 
-  // 优先检查环境变量中的合约地址
+  // Check environment variables for contract addresses first
   const envAddressKey = chainId === 31337 ? 'NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST' :
                        chainId === 11155111 ? 'NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA' :
                        `NEXT_PUBLIC_CONTRACT_ADDRESS_${chainId}`;
@@ -71,7 +71,7 @@ function getContractInfo(chainId?: number): ContractInfo {
     };
   }
 
-  // 回退到静态配置
+  // Fallback to static configuration
   const key = chainId.toString() as keyof typeof addresses;
   const entry = addresses[key];
 
@@ -93,7 +93,7 @@ export function useEncryptedMvpVoting(): VotingState {
 
   const contractInfo = useMemo(() => getContractInfo(signerState.chainId), [signerState.chainId]);
 
-  // 网络匹配性验证
+  // Network compatibility validation
   const validateNetworkMatch = useCallback(() => {
     if (!contractInfo.chainId || !signerState.chainId) return true;
 
@@ -271,14 +271,14 @@ export function useEncryptedMvpVoting(): VotingState {
       try {
         if (USE_SIMPLE_VOTING) {
           // Simple voting: data is already clear, but we simulate a "decryption request" process
-          console.log("🔐 开始解密请求流程...");
+          console.log("🔐 Starting decryption process...");
           setStatusMessage("🔐 Requesting decryption access...");
           progressCallback?.("🔐 Starting decryption process...");
 
           const contract = new ethers.Contract(contractInfo.address, contractInfo.abi, signerState.ethersSigner);
 
           // Step 1: Request decryption access (call allowAdminToDecrypt) - optional for simple voting
-          console.log("📡 发送allowAdminToDecrypt请求...");
+          console.log("📡 Sending allowAdminToDecrypt request...");
 
           // Show initial popup notification
           toast.info("🔐 Initiating decryption request...", {
@@ -287,7 +287,7 @@ export function useEncryptedMvpVoting(): VotingState {
           });
 
           // Always try to send a transaction to trigger MetaMask popup
-          console.log("📡 发送解密请求到MetaMask...");
+          console.log("📡 Sending decryption request to MetaMask...");
           progressCallback?.("📡 Sending transaction to MetaMask...");
 
           toast.loading("📡 Sending transaction to MetaMask...", {
@@ -300,7 +300,7 @@ export function useEncryptedMvpVoting(): VotingState {
           try {
             // Send the transaction - this will trigger MetaMask popup
             const tx = await contract.allowAdminToDecrypt(playerId);
-            console.log("✅ 用户在MetaMask中确认了交易:", tx.hash);
+            console.log("✅ User confirmed transaction in MetaMask:", tx.hash);
             progressCallback?.("⏳ Waiting for transaction confirmation...");
 
             toast.loading("⏳ Waiting for transaction confirmation...", {
@@ -310,7 +310,7 @@ export function useEncryptedMvpVoting(): VotingState {
 
             setStatusMessage("⏳ Waiting for transaction confirmation...");
             const receipt = await tx.wait();
-            console.log("✅ 交易确认成功:", receipt.hash);
+            console.log("✅ Transaction confirmed successfully:", receipt.hash);
 
             toast.success("✅ Transaction confirmed!", {
               id: "decrypt-request",
@@ -320,8 +320,8 @@ export function useEncryptedMvpVoting(): VotingState {
             setStatusMessage("✅ Transaction confirmed!");
             progressCallback?.("✅ Transaction confirmed!");
           } catch (error: any) {
-            console.error("❌ 交易失败或用户拒绝:", error);
-            console.log("🔍 错误详情:", {
+            console.error("❌ Transaction failed or user rejected:", error);
+            console.log("🔍 Error details:", {
               code: error.code,
               message: error.message,
               data: error.data,
@@ -330,7 +330,7 @@ export function useEncryptedMvpVoting(): VotingState {
 
             // Check if it's a user rejection in MetaMask
             if (error.code === 4001 || error.message?.includes("User denied")) {
-              console.log("👤 用户在MetaMask中取消了交易");
+              console.log("👤 User cancelled transaction in MetaMask");
               toast.error("❌ Transaction cancelled", {
                 description: "You cancelled the transaction in MetaMask"
               });
@@ -343,7 +343,7 @@ export function useEncryptedMvpVoting(): VotingState {
             }
 
             // Handle transaction failures
-            console.log("ℹ️ 交易失败，继续直接读取数据...");
+            console.log("ℹ️ Transaction failed, proceeding with direct data access...");
             toast.warning("⚠️ Transaction failed, proceeding with direct access", {
               description: "Using read-only data access"
             });
@@ -353,13 +353,13 @@ export function useEncryptedMvpVoting(): VotingState {
           }
 
           // Step 2: Fetch the decrypted data
-          console.log("📊 读取解密后的数据...");
+          console.log("📊 Reading decrypted data...");
           progressCallback?.("📊 Fetching decrypted vote data...");
           setStatusMessage("📊 Fetching decrypted vote data...");
           await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay for UX
 
           const [name, score, ballots] = await contract.getPlayer(playerId);
-          console.log("✅ 数据读取成功:", { name, score: Number(score), ballots: Number(ballots) });
+          console.log("✅ Data read successfully:", { name, score: Number(score), ballots: Number(ballots) });
           progressCallback?.("✅ Data retrieved successfully");
 
           // For simple voting, the score is already clear

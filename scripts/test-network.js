@@ -1,69 +1,69 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("🔍 检查网络连接和合约功能...");
+  console.log("🔍 Checking network connection and contract functionality...");
 
-  // 检查当前网络
+  // Check current network
   const network = await ethers.provider.getNetwork();
-  console.log(`📡 当前网络: ${network.name} (Chain ID: ${network.chainId})`);
+  console.log(`📡 Current network: ${network.name} (Chain ID: ${network.chainId})`);
 
-  // 检查是否能读取区块号
+  // Check if we can read block number
   try {
     const blockNumber = await ethers.provider.getBlockNumber();
-    console.log(`📦 当前区块号: ${blockNumber}`);
+    console.log(`📦 Current block number: ${blockNumber}`);
   } catch (error) {
-    console.error("❌ 无法读取区块号:", error.message);
+    console.error("❌ Unable to read block number:", error.message);
     return;
   }
 
-  // 检查合约是否已部署
+  // Check if contract is deployed
   try {
     const contractAddress = process.env.CONTRACT_ADDRESS ||
                            process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST;
     if (contractAddress) {
-      console.log(`🎯 检查合约地址: ${contractAddress}`);
+      console.log(`🎯 Checking contract address: ${contractAddress}`);
 
       const SimpleVoting = await ethers.getContractFactory("SimpleVoting");
       const contract = SimpleVoting.attach(contractAddress);
 
-      // 测试基本读取功能
+      // Test basic read functionality
       const totalPlayers = await contract.totalPlayers();
-      console.log(`👥 合约中的玩家总数: ${totalPlayers}`);
+      console.log(`👥 Total players in contract: ${totalPlayers}`);
 
       if (totalPlayers > 0) {
         const playersList = await contract.listPlayers();
-        console.log(`📋 玩家列表:`);
+        console.log(`📋 Player list:`);
         for (let i = 0; i < Math.min(Number(totalPlayers), 3); i++) {
-          console.log(`  - 玩家 ${i}: ${playersList[0][i]} (投票数: ${playersList[2][i]})`);
+          console.log(`  - Player ${i}: ${playersList[0][i]} (votes: ${playersList[2][i]})`);
         }
       }
 
-      console.log("✅ 合约读取功能正常");
+      console.log("✅ Contract read functionality working");
     } else {
-      console.log("ℹ️  未设置 CONTRACT_ADDRESS 环境变量，跳过合约检查");
+      console.log("ℹ️ CONTRACT_ADDRESS environment variable not set, skipping contract check");
     }
   } catch (error) {
-    console.error("❌ 合约检查失败:", error.message);
+    console.error("❌ Contract check failed:", error.message);
   }
 
-  // 检查网络类型和跨链能力
+  // Check network type and cross-chain capabilities
   if (network.chainId === 11155111n) {
-    console.log("🌐 当前在 Sepolia 测试网");
-    console.log("📝 注意: 测试网合约无法直接向主网发送交易");
-    console.log("🔄 如需跨链交互，需要使用桥接协议或预言机服务");
+    console.log("🌐 Currently on Sepolia testnet");
+    console.log("📝 Note: Testnet contracts cannot directly send transactions to mainnet");
+    console.log("🔄 For cross-chain interactions, use bridge protocols or oracle services");
   } else if (network.chainId === 1n) {
-    console.log("🌐 当前在 Ethereum 主网");
+    console.log("🌐 Currently on Ethereum mainnet");
   } else if (network.chainId === 31337n) {
-    console.log("🧪 当前在本地 Hardhat 网络");
-    console.log("💡 本地网络用于测试，不支持真实跨链交互");
+    console.log("🧪 Currently on local Hardhat network");
+    console.log("💡 Local network for testing, does not support real cross-chain interactions");
   } else {
-    console.log(`🌐 当前在未知网络 (Chain ID: ${network.chainId})`);
+    console.log(`🌐 Currently on unknown network (Chain ID: ${network.chainId})`);
   }
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error("❌ 脚本执行失败:", error);
+    console.error("❌ Script execution failed:", error);
     process.exit(1);
   });
