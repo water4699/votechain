@@ -1,35 +1,44 @@
-const { ethers } = require("hardhat");
-
 async function main() {
-  const contractAddress = "0x957C469fcfdF9eD0a558406318B767a21B13bB49";
+  console.log("🔍 Checking Sepolia contract deployment...");
 
-  console.log("Checking contract at:", contractAddress);
+  // Check SimpleVoting contract
+  const simpleVotingAddress = "0xF51dA7a6fa07913DfDc9345aC04fC837Bdf23aF6";
+  console.log("🎯 Checking SimpleVoting at:", simpleVotingAddress);
 
   try {
-    // Try to get code at the address
-    const code = await ethers.provider.getCode(contractAddress);
+    const simpleVotingCode = await ethers.provider.getCode(simpleVotingAddress);
+    if (simpleVotingCode === "0x") {
+      console.log("❌ SimpleVoting contract not found");
+    } else {
+      console.log("✅ SimpleVoting contract found");
 
-    if (code === "0x") {
-      console.log("❌ No contract found at this address");
-      return;
+      const SimpleVoting = await ethers.getContractFactory("SimpleVoting");
+      const simpleContract = SimpleVoting.attach(simpleVotingAddress);
+      const playerCount = await simpleContract.totalPlayers();
+      console.log("👥 SimpleVoting players:", playerCount.toString());
     }
-
-    console.log("✅ Contract found at this address");
-    console.log("Code length:", code.length);
-
-    // Try to create contract instance and call a simple method
-    const EncryptedMvpVoting = await ethers.getContractFactory("EncryptedMvpVoting");
-    const contract = EncryptedMvpVoting.attach(contractAddress);
-
-    try {
-      const playerCount = await contract.totalPlayers();
-      console.log("✅ Contract is responding. Total players:", playerCount.toString());
-    } catch (error) {
-      console.log("❌ Contract exists but method call failed:", error.message);
-    }
-
   } catch (error) {
-    console.log("❌ Error checking contract:", error.message);
+    console.log("❌ Error checking SimpleVoting:", error.message);
+  }
+
+  // Check EncryptedMvpVoting contract
+  const encryptedVotingAddress = "0xA6a13408Cf2F5B5C713F84Fa42290817E61b1338";
+  console.log("🎯 Checking EncryptedMvpVoting at:", encryptedVotingAddress);
+
+  try {
+    const encryptedVotingCode = await ethers.provider.getCode(encryptedVotingAddress);
+    if (encryptedVotingCode === "0x") {
+      console.log("❌ EncryptedMvpVoting contract not found");
+    } else {
+      console.log("✅ EncryptedMvpVoting contract found");
+
+      const EncryptedMvpVoting = await ethers.getContractFactory("EncryptedMvpVoting");
+      const encryptedContract = EncryptedMvpVoting.attach(encryptedVotingAddress);
+      const playerCount = await encryptedContract.totalPlayers();
+      console.log("👥 EncryptedMvpVoting players:", playerCount.toString());
+    }
+  } catch (error) {
+    console.log("❌ Error checking EncryptedMvpVoting:", error.message);
   }
 }
 
