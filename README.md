@@ -113,7 +113,7 @@ NEXT_PUBLIC_INFURA_ID=your_infura_project_id_here
 # These override the static addresses from EncryptedMvpVotingAddresses.ts
 
 # Localhost (Hardhat) contract address
-NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x5FbDB2315678afecb367f032d93F642f64180aa3
 
 # Sepolia contract address (set after deployment)
 NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA=0x0000000000000000000000000000000000000000
@@ -144,9 +144,9 @@ If not set, the frontend falls back to addresses from `EncryptedMvpVotingAddress
 2. **Update environment variables**:
    ```bash
    # For localhost development
-   NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x0000000000000000000000000000000000000000
+   NEXT_PUBLIC_CONTRACT_ADDRESS_LOCALHOST=0x5FbDB2315678afecb367f032d93F642f64180aa3
 
-   # For Sepolia testnet
+   # For Sepolia testnet (update after deployment)
    NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA=0x0000000000000000000000000000000000000000
    ```
 
