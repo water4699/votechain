@@ -10,6 +10,10 @@ const rel = "..";
 // <root>/packages/site/components
 const outdir = path.resolve("./abi");
 
+// Declare variables for deployments
+let deployLocalhost;
+let deploySepolia;
+
 if (!fs.existsSync(outdir)) {
   fs.mkdirSync(outdir);
 }
