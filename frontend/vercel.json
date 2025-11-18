@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run genabi && next build",
+  "devCommand": "npm run genabi && next dev",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
