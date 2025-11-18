@@ -239,12 +239,18 @@ export const createFhevmInstance = async (parameters: {
       notify("creating");
 
       //////////////////////////////////////////////////////////////////////////
-      // 
+      //
       // WARNING!!
-      // ALWAY USE DYNAMIC IMPORT TO AVOID INCLUDING THE ENTIRE FHEVM MOCK LIB 
+      // ALWAY USE DYNAMIC IMPORT TO AVOID INCLUDING THE ENTIRE FHEVM MOCK LIB
       // IN THE FINAL PRODUCTION BUNDLE!!
-      // 
+      //
       //////////////////////////////////////////////////////////////////////////
+
+      // In production/CI environments, mock is not available
+      if (process.env.CI || process.env.VERCEL || process.env.NODE_ENV === "production") {
+        throw new Error("FHEVM Mock is not available in production environment");
+      }
+
       const fhevmMock = await import("./mock/fhevmMock");
       const mockInstance = await fhevmMock.fhevmMockCreateInstance({
         rpcUrl,
